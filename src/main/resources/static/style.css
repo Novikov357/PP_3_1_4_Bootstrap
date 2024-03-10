@@ -1,0 +1,18 @@
+table {
+    background-color: #d8da3d;
+    table-layout: fixed;
+    height: 25%;
+    border: double 5px;
+    border-collapse: collapse;
+    padding: 5px;
+}
+
+th,
+td {
+    padding: 10px;
+    border: 2px solid;
+}
+
+fieldset {
+    width: fit-content;
+}

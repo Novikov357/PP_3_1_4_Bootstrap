@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add user</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<fieldset>
+    <legend><b>Add user</b></legend>
+    <form th:method="post" th:action="@{/admin/new}" th:object="${user}">
+        <label>Name
+            <input type="text" required placeholder="Имя" th:field="*{username}">
+        </label>
+        <br>
+        <label>Email
+            <input type="email" placeholder="Email" th:field="*{email}">
+        </label>
+        <br>
+        <label>Password
+            <input type="text" required placeholder="Password" th:field="*{password}">
+        </label>
+        <br>
+        <label>
+            <input type="checkbox" name="roles" value="ADMIN">
+            ADMIN
+        </label>
+        <br>
+        <label>
+            <input type="checkbox" checked name="roles" value="USER">
+            USER
+        </label>
+        <br>
+        <input type="submit" value="Add User">
+        <input type="reset" value="Reset">
+    </form>
+</fieldset>
+
+<br>
+<div style="color:red;" th:text="${message}"></div>
+<br>
+
+<fieldset>
+    <a th:href="'/admin/users'">All users page</a>
+    <br>
+    <form th:method="get" th:action="@{/logout}">
+        <a th:href="'/logout'">Logout</a>
+    </form>
+</fieldset>
+
+</body>
+</html>

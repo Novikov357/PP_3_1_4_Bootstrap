@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Change password</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div>
+    <fieldset>
+        <legend><b>Change password</b></legend>
+        <form th:method="post" th:action="@{/admin/change-password}" th:object="${passDTO}">
+
+            <label>
+                <input hidden="hidden" type="text" th:field="*{userId}">
+            </label>
+            <br>
+            <label>Old password
+                <input type="text" required th:field="*{oldPass}">
+            </label>
+            <div style="color:red;" th:text="${messageFail}"></div>
+            <br>
+            <label>New password
+                <input type="text" required th:field="*{newPass}">
+            </label>
+            <div style="color:green;" th:text="${messageSuccess}"></div>
+            <br>
+            <input type="submit" value="Update Password">
+        </form>
+    </fieldset>
+</div>
+<br>
+
+<fieldset>
+    <form th:method="get" th:action="@{/admin/users}">
+        <a th:href="'/admin/users'">All users</a>
+    </form>
+    <br>
+    <form th:method="get" th:action="@{/logout}">
+        <a th:href="'/logout'">Logout</a>
+    </form>
+</fieldset>
+
+</body>
+</html>
