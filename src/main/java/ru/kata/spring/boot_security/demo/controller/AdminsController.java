@@ -2,7 +2,6 @@ package ru.kata.spring.boot_security.demo.controller;
 
 import lombok.AllArgsConstructor;
 import org.hibernate.NonUniqueObjectException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +32,7 @@ public class AdminsController {
     public String doUpdate(@ModelAttribute("user") UserDTO user, Model model) {
         userService.updateUser(user);
         model.addAttribute(user);
-        return "editUser";
+        return "redirect:/admin/users";
     }
 
     @GetMapping("/changePassword")

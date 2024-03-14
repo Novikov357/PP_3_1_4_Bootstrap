@@ -20,7 +20,7 @@ public class Runner implements CommandLineRunner {
     private RoleService roleService;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args){
         if (roleService.findByRoleName("ADMIN") == null) {
             roleService.addRole(new Role("USER"));
             roleService.addRole(new Role("ADMIN"));

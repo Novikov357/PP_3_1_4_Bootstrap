@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kata.spring.boot_security.demo.model.PasswordDTO;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.model.UserDTO;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
@@ -27,21 +26,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Transactional
     public void addUser(UserDTO userDTO) throws NonUniqueObjectException {
-        User user1 = userRepository.findUserByUsername(userDTO.getUsername());
-        if (user1 != null) {
-            throw new NonUniqueObjectException("Not a unique username", user1.getUsername());
+        User user = userRepository.findUserByUsername(userDTO.getUsername());
+        if (user != null) {
+            throw new NonUniqueObjectException("Not a unique username", user.getUsername());
+        } else {
+            user = toUser(userDTO, new User());
+            user.setPassword(this.getPasswordEncoder().encode(userDTO.getPassword()));
+            userRepository.save(user);
         }
-        User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(this.getPasswordEncoder().encode(userDTO.getPassword()));
-        List<Role> roles = userDTO
-                .getRoles()
-                .stream()
-                .map(rolename -> roleService.findByRoleName(rolename))
-                .collect(Collectors.toList());
-        user.setRoles(roles);
-        userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
@@ -51,11 +43,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Transactional
     public void updateUser(UserDTO userDTO) {
-        User user = userRepository.findById(userDTO.getId()).get();
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        user.setRoles(userDTO.getRoles().stream().map(rolename -> roleService
-                .findByRoleName(rolename)).collect(Collectors.toList()));
+        User user = toUser(userDTO, userRepository.findById(userDTO.getId()).get());
         userRepository.save(user);
     }
 
@@ -97,5 +85,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    private User toUser(UserDTO userDTO, User user) {
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setRoles(userDTO.getRoles().stream().map(rolename -> roleService
+                .findByRoleName(rolename)).collect(Collectors.toList()));
+        return user;
     }
 }
