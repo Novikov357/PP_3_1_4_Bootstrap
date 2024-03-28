@@ -28,30 +28,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().successHandler(successUserHandler)
+                .loginPage("/")
+                .usernameParameter("email")
                 .permitAll()
                 .and()
                 .logout()
                 .permitAll();
     }
-
-    // аутентификация inMemory
-//    @Bean
-//    @Override
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user = User.builder()
-//                .username("user")
-////                .password("user")
-//                .password("{bcrypt}$2a$12$GMFBjlhmbDcFVjtV2Q7kTe..q7K70WDBCe7Ip7lb9jUKrl3zz3dI.")
-//                .roles("USER")
-//                .build();
-//        UserDetails admin = User.builder()
-//                .username("admin")
-////                .password("admin")
-//                .password("{bcrypt}$2a$12$pj9w1yaVN/l56knWE/mh..lSmxBrBBW3y1I05.S2AOHad6za8z//6")
-//                .roles("ADMIN, USER")
-//                .build();
-//        return new InMemoryUserDetailsManager(user, admin);
-//    }
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider () {

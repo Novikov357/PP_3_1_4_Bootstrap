@@ -1,13 +1,19 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import lombok.AllArgsConstructor;
-import org.hibernate.NonUniqueObjectException;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.model.PasswordDTO;
+import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.model.UserDTO;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -15,66 +21,51 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 public class AdminsController {
 
     private UserService userService;
+    private RoleService roleService;
 
-    @GetMapping("/users")
-    public String printAllUsers(Model model) {
+    @GetMapping
+    public String mainPage(Principal principal, Model model, Session session, HttpServletRequest request,
+                           @RequestParam(value = "message", required = false) String message) {
+        User user = userService.findUserByEmail(principal.getName());
+        if (user == null) {
+            try {
+                request.logout();
+                session.setPersistent(false);
+                return "redirect:/?info&?logout";
+            } catch (ServletException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        model.addAttribute("message", message != null);
+        model.addAttribute("user", user);
         model.addAttribute("users", userService.getUserList());
-        return "allUsers";
+        model.addAttribute("roles", roleService.getAllRoles());
+        return "admin";
     }
 
-    @GetMapping("/edit")
-    public String updateUser(@RequestParam Long id, Model model) {
-        model.addAttribute(userService.getUser(id));
-        return "editUser";
+    @PostMapping("/update/{id}")
+    public String doUpdate(@ModelAttribute("user") UserDTO userDTO, Model model) {
+        List<String> rolesList = List.of("USER", "ADMIN");
+        model.addAttribute("roles", rolesList);
+        userService.updateUser(userDTO);
+        model.addAttribute(userDTO);
+        return "redirect:/admin";
     }
 
-    @PostMapping("/applyapdate")
-    public String doUpdate(@ModelAttribute("user") UserDTO user, Model model) {
-        userService.updateUser(user);
-        model.addAttribute(user);
-        return "redirect:/admin/users";
-    }
-
-    @GetMapping("/changePassword")
-    public String changePass(@RequestParam Long id, Model model) {
-        model.addAttribute("passDTO", new PasswordDTO(id, "", ""));
-        return "changePass";
-    }
-
-    @PostMapping("/change-password")
-    public String changePassword(@ModelAttribute("passDTO") PasswordDTO pass, Model model) {
-        if (pass.getNewPass().equals(pass.getOldPass())) {
-            model.addAttribute("messageFail", "Пароли совпадают");
-            return "changePass";
-        }
-        if (userService.updatePassword(pass)) {
-            model.addAttribute("messageSuccess", "Пароль обновлен");
-            return "changePass";
-        }
-        model.addAttribute("messageFail", "Неверный пароль");
-        return "changePass";
-    }
-
-    @GetMapping("/delete")
-    public String deleteUser(@RequestParam Long id) {
+    @PostMapping("delete/{id}")
+    public String deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/addUser")
-    public String addUser(@ModelAttribute("user") UserDTO user) {
-        return "addUser";
-    }
-
-    @PostMapping("/new")
-    public String newUser(@ModelAttribute("user") UserDTO user, Model model) {
+    @PostMapping("/addUser")
+    public String newUser(@ModelAttribute("user") UserDTO user) {
         try {
             userService.addUser(user);
-        } catch (NonUniqueObjectException e) {
-            model.addAttribute("message", e.getMessage());
+        } catch (Exception e) {
             System.out.println(e.getMessage());
-            return "addUser";
+            return "redirect:/admin?message";
         }
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 }

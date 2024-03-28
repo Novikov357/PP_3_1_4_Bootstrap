@@ -10,18 +10,14 @@ import java.security.Principal;
 
 @Controller
 @AllArgsConstructor
+@RequestMapping("/user")
 public class UsersController {
 
     private UserService userService;
 
-    @GetMapping("/index")
-    public String indexPage() {
-        return "index";
-    }
-
-    @GetMapping("/user")
-    public String getAuthorisedUser(Principal principal, Model model) {
-        model.addAttribute("user", userService.findUserByUsername(principal.getName()));
+    @GetMapping
+    public String index(Principal principal, Model model) {
+        model.addAttribute("user", userService.findUserByEmail(principal.getName()));
         return "user";
     }
 }

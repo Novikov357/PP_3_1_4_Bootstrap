@@ -3,7 +3,6 @@ package ru.kata.spring.boot_security.demo.service;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.kata.spring.boot_security.demo.model.PasswordDTO;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.model.UserDTO;
 
@@ -11,7 +10,7 @@ import java.util.List;
 
 public interface UserService extends UserDetailsService {
 
-    void addUser(UserDTO user);
+    void addUser(UserDTO user) throws Exception;
 
     User getUser(Long id);
 
@@ -23,9 +22,7 @@ public interface UserService extends UserDetailsService {
 
     UserDetails loadUserByUsername(String username);
 
-    User findUserByUsername(String username);
-
-    boolean updatePassword(PasswordDTO passwordDTO);
+    User findUserByEmail(String email);
 
     PasswordEncoder getPasswordEncoder();
 }
